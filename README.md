@@ -70,6 +70,25 @@ Please head to [WiLoR-mini](https://github.com/warmshao/WiLoR-mini) for addition
 python demo.py --img_folder demo_img --out_folder demo_out --save_mesh --fast
 ```
 **[🚀 Update March 2026]**: Use argument `--fast` for up to **1.6** faster inference.  
+
+### Live Intel RealSense
+
+Create the Pixi environment and show the predicted MANO mesh live on the RGB
+stream of the D435I on USB port `10.2`:
+
+```bash
+pixi install
+pixi run realsense
+```
+
+The demo uses serial `848312072126` by default; choose another camera with
+`pixi run realsense -- --serial SERIAL`. Add `--fast` to use FP16 and WiLoR's
+depth pruning. The official WiLoR assets (`detector.pt`, `wilor_final.ckpt`,
+and licensed `MANO_RIGHT.pkl`) must be installed as described above.
+
+For XHand retargeting, the live demo also sends the 21 right-hand MANO joints
+as JSON UDP packets to `127.0.0.1:5005`. Set `--udp-port 0` to disable it.
+
 ## Start a local gradio demo
 You can start a local demo for inference by running:
 ```bash
