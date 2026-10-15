@@ -54,6 +54,10 @@ wget https://huggingface.co/spaces/rolpotamias/WiLoR/resolve/main/pretrained_mod
 ```
 It is also required to download MANO model from [MANO website](https://mano.is.tue.mpg.de). 
 Create an account by clicking Sign Up and download the models (mano_v*_*.zip). Unzip and place the right hand model `MANO_RIGHT.pkl` under the `mano_data/` folder. 
+The WiLoR authors also host the same `MANO_RIGHT.pkl` in their [Hugging Face Space](https://huggingface.co/spaces/rolpotamias/WiLoR/blob/main/mano_data/mano/MANO_RIGHT.pkl):
+```bash
+wget https://huggingface.co/spaces/rolpotamias/WiLoR/resolve/main/mano_data/mano/MANO_RIGHT.pkl -P ./mano_data/
+```
 Note that MANO model falls under the [MANO license](https://mano.is.tue.mpg.de/license.html).
 
 ### Quick Installation
@@ -74,20 +78,37 @@ python demo.py --img_folder demo_img --out_folder demo_out --save_mesh --fast
 ### Live Intel RealSense
 
 Create the Pixi environment and show the predicted MANO mesh live on the RGB
-stream of the D435I on USB port `10.2`:
+stream of a connected RealSense camera:
 
 ```bash
 pixi install
 pixi run realsense
 ```
 
-The demo uses serial `848312072126` by default; choose another camera with
-`pixi run realsense -- --serial SERIAL`. Add `--fast` to use FP16 and WiLoR's
+The demo selects the camera automatically when exactly one is connected. If
+multiple cameras are connected, choose one with `pixi run realsense -- --serial SERIAL`.
+Add `--fast` to use FP16 and WiLoR's
 depth pruning. The official WiLoR assets (`detector.pt`, `wilor_final.ckpt`,
 and licensed `MANO_RIGHT.pkl`) must be installed as described above.
 
 For XHand retargeting, the live demo also sends the 21 right-hand MANO joints
 as JSON UDP packets to `127.0.0.1:5005`. Set `--udp-port 0` to disable it.
+
+### Live Meta Quest RGB camera
+
+With an authorized Quest 3 connected over ADB and the pinned scrcpy server
+installed, preview the passthrough RGB camera or run WiLoR on its H.264 stream:
+
+```bash
+pixi run quest-preview
+pixi run quest --fast
+```
+
+Run one command at a time. Use `--eye right` to select the right camera.
+Joint publishing is disabled by default; add `--udp-port 5005` to the WiLoR
+command to send right-hand joints to the existing retargeter.
+See [the Quest setup and validation guide](docs/quest-camera.md) for tool
+installation, WiVRn coexistence, timestamp semantics, and test limitations.
 
 ## Start a local gradio demo
 You can start a local demo for inference by running:

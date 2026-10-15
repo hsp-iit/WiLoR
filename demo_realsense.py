@@ -19,13 +19,12 @@ from wilor.utils import recursive_to
 from wilor.utils.renderer import cam_crop_to_full
 
 
-DEFAULT_SERIAL = "848312072126"  # D435I on USB port 10.2
 MESH_COLOR = (168, 70, 64)  # BGR, purple
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--serial", default=DEFAULT_SERIAL)
+    parser.add_argument("--serial", help="RealSense serial number; auto-select if only one is connected")
     parser.add_argument("--width", type=int, default=640)
     parser.add_argument("--height", type=int, default=480)
     parser.add_argument("--fps", type=int, default=30)
@@ -74,6 +73,13 @@ def draw_mesh(frame, verts, cam_t, faces, focal, width, height):
 def main():
     args = parse_args()
     require_assets()
+    if args.serial is None:
+        devices = list(rs.context().query_devices())
+        if len(devices) != 1:
+            raise SystemExit(
+                f"Found {len(devices)} RealSense cameras; connect one or pass --serial SERIAL."
+            )
+        args.serial = devices[0].get_info(rs.camera_info.serial_number)
     camera = rs.pipeline()
     config = rs.config()
     config.enable_device(args.serial)
